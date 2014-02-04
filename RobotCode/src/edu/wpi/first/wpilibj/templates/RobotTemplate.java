@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick; 
 import edu.wpi.first.wpilibj.SimpleRobot;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Timer; 
 
 // used to read and write values into the robot code with out recompiling,
@@ -44,9 +45,11 @@ public class RobotTemplate extends SimpleRobot {
     Joystick assistStick = new Joystick(2);
     //Intake intakeSystem = new Intake(3, assistStick, lcd);
     RobotDrive driveA = new RobotDrive(3,10);
-    Talon liftMotor = new Talon(4);
+    //Talon liftMotor = new Talon(4);
+    //declare RobotDrive object
     
     double dir;
+    double dirM;
     
     public class JsonSimpleExample {
      public void readFile (String[] args) {
@@ -95,12 +98,12 @@ public class RobotTemplate extends SimpleRobot {
      */
     public void autonomous() {
         
-        liftMotor.set(-.25);
+        //liftMotor.set(-.25);
         Timer.delay(1.00);
         driveM.drive(0.25, 0.0);
         Timer.delay(2.00);
         driveM.drive(0.0, 0.0);
-        driveA.drive(0.30,0.0);
+        driveA.drive(0.65,0.0);
         Timer.delay(1.00);
         driveA.drive(0.0,0.0);
         driveM.drive(-0.25, 0.0);
@@ -118,19 +121,20 @@ public class RobotTemplate extends SimpleRobot {
         lcd.println(Line.kUser1, 1, "Operator Control Enabled");
         lcd.updateLCD();
         
-        driveM.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
-        driveM.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
+        //driveM.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
+        //driveM.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
         
         //loop
         while(isOperatorControl() && isEnabled()) {
-            
+           //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
             
             //driveA.arcadeDrive(assistStick,true);
             
+            dirM =(driveStick.getX());
+            //driveM.drive(0.0,-dirM);
+            
             dir = Math.toDegrees(assistStick.getDirectionRadians());
-            
-            
             
             if(assistStick.getTrigger())
                 driveA.drive(getSpeedByJoystick(dir),0.0);
@@ -139,6 +143,7 @@ public class RobotTemplate extends SimpleRobot {
             
             
             lcd.println(Line.kUser2, 2, Double.toString(dir));
+            lcd.println(Line.kUser3, 3, Double.toString(dirM));
             lcd.updateLCD();
             Timer.delay(0.005);
         }
@@ -151,9 +156,9 @@ public class RobotTemplate extends SimpleRobot {
      * This function is called periodically during test mode
      */
     public void test() {
-        liftMotor.set(0.25);
+        //liftMotor.set(0.25);
         Timer.delay(1.00);
-        liftMotor.set(0.00);
+        //liftMotor.set(0.00);
         
     }
     
