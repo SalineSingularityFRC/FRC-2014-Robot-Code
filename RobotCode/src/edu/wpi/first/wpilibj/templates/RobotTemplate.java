@@ -10,22 +10,26 @@ package edu.wpi.first.wpilibj.templates;
 import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.DriverStationLCD.Line;
 import edu.wpi.first.wpilibj.RobotDrive; 
+import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick; 
-import edu.wpi.first.wpilibj.SimpleRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.Timer; 
+import edu.wpi.first.wpilibj.Victor;
+import java.util.Hashtable;
 
 // used to read and write values into the robot code with out recompiling,
 //download available at https://code.google.com/p/json-simple/downloads/list
 
-import java.io.FileNotFoundException;
+/*import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+*/
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -34,7 +38,7 @@ import org.json.simple.parser.ParseException;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class RobotTemplate extends SimpleRobot {
+public class RobotTemplate extends IterativeRobot {
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -45,13 +49,29 @@ public class RobotTemplate extends SimpleRobot {
     Joystick assistStick = new Joystick(2);
     //Intake intakeSystem = new Intake(3, assistStick, lcd);
     RobotDrive driveA = new RobotDrive(3,10);
-    //Talon liftMotor = new Talon(4);
+    Victor launchMotor = new Victor(5);
+    Talon liftMotor = new Talon(4);
+    Timer timeKeeper = new Timer();
     //declare RobotDrive object
     
     double dir;
     double dirM;
+    double dirX;
+    double dirY;
+    double t;
+    double s = 0;
     
-    public class JsonSimpleExample {
+    
+    double winchTime = 0.00;
+    double winchSpeed = 0.00;
+    double driveTime1 = 0.00;
+    double driveSpeed1 = 0.00;
+    double assistTime = 0.00;
+    double assistSpeed = 0.00;
+    double driveTime2 = 0.00;
+    double driveSpeed2 = 0.00;
+    
+    /*public class JsonSimpleExample {
      public void readFile (String[] args) {
  
 	JSONParser parser = new JSONParser();
@@ -88,86 +108,108 @@ public class RobotTemplate extends SimpleRobot {
      }
  
 }
-    
+    */
     public void robotInit() {
         lcd.println(Line.kUser6, 1, "Robot Initialized");
+        lcd.updateLCD();
+        
+    //Hashtable<String, Double> autonParams =
+      //  autonParams = new Hashtable<String, Double>();
+   //autonParams.put("winchSpeed", );
     }
 
+    public void autonomousInit() {
+        lcd.println(Line.kUser4, 1, "autoInit: TK reset");
+        lcd.updateLCD();
+        timeKeeper.reset();
+        timeKeeper.start();
+    }
+    
+    public void disabledInit(){
+        lcd.println(Line.kUser5, 1, "disabledInit: TK stop");
+        lcd.updateLCD();
+        timeKeeper.stop();
+    }
+    
     /**
      * This function is called periodically during autonomous
      */
-    public void autonomous() {
+    public void autonomousPeriodic() {
+       lcd.println(Line.kUser2, 2, "Auton enabled");
         
-        //liftMotor.set(-.25);
-        Timer.delay(1.00);
-        driveM.drive(0.25, 0.0);
-        Timer.delay(2.00);
-        driveM.drive(0.0, 0.0);
-        driveA.drive(0.65,0.0);
-        Timer.delay(1.00);
-        driveA.drive(0.0,0.0);
-        driveM.drive(-0.25, 0.0);
-        Timer.delay(1.00);
-        driveM.drive(0.0, 0.0);
-        Timer.delay(5.00);
-        
-        
+        lcd.println(Line.kUser3, 3, Double.toString(t));
+        lcd.updateLCD();
     }
 
+    
     /**
      * This function is called periodically during operator control
      */
-    public void operatorControl() {
+    public void teleopPeriodic() {
         lcd.println(Line.kUser1, 1, "Operator Control Enabled");
         lcd.updateLCD();
         
-        //driveM.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
-        //driveM.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
-        
-        //loop
-        while(isOperatorControl() && isEnabled()) {
-           //if(0<dirM<) 
+        timeKeeper.start();
+           
+           dirX = driveStick.getX();
+           dirY =driveStick.getY();
+           dirM = driveStick.getDirectionRadians();
+            
+            //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
-            
-            //driveA.arcadeDrive(assistStick,true);
-            
-            dirM =(driveStick.getX());
-            //driveM.drive(0.0,-dirM);
+            driveA.arcadeDrive(assistStick, true);
+            if(assistStick.getTrigger())
+                launchMotor.set(-1.00);
+            else
+                launchMotor.set(0.00);
             
             dir = Math.toDegrees(assistStick.getDirectionRadians());
-            
-            if(assistStick.getTrigger())
-                driveA.drive(getSpeedByJoystick(dir),0.0);
-            else
-                driveA.drive(0,0);
             
             
             lcd.println(Line.kUser2, 2, Double.toString(dir));
             lcd.println(Line.kUser3, 3, Double.toString(dirM));
+            lcd.println(Line.kUser4, 4, Double.toString(dirX));
+            lcd.println(Line.kUser5, 5, Double.toString(dirY));
             lcd.updateLCD();
             Timer.delay(0.005);
-        }
-        lcd.clear();
-        
-        
+            lcd.clear();
     }
     
     /**
      * This function is called periodically during test mode
      */
-    public void test() {
-        //liftMotor.set(0.25);
-        Timer.delay(1.00);
-        //liftMotor.set(0.00);
+    public void testPeriodic() {
         
+        if(assistStick.getTrigger()) {
+            liftMotor.set(-0.40);
+        }
+        else if(driveStick.getTrigger()) {
+            liftMotor.set(0.40);
+        }
+        else
+            liftMotor.set(0.00);
+        //timeKeeper.start();
+        /*liftMotor.set(-0.25);
+        Timer.delay(0.50);
+        liftMotor.set(0.25);
+        Timer.delay(3.00);
+        liftMotor.set(0.00);
+                */
     }
-    
     private double getSpeedByJoystick(double direction) {
         Math.abs(direction);
         double temp_dir = 90.0 - direction;
         if(temp_dir > 0)
-            return 0.65;
+            return 0.35;
         else
-            return -0.65;
+            return -0.35;
+    }
+    
+    private class AutonEvent{
+        
+        AutonEvent(double startTime, double timeLength, double speed) {
+            
+        }
+        
     }
 }
