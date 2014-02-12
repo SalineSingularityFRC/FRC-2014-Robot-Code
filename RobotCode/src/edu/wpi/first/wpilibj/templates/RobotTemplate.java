@@ -136,15 +136,27 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void autonomousPeriodic() {
        lcd.println(Line.kUser2, 2, "Auton enabled");
-        
-        lcd.println(Line.kUser3, 3, Double.toString(t));
-        lcd.updateLCD();
+       t=timeKeeper.get();
+       if( t >=  0.00 && t < 5.00)
+       {driveM.drive(-0.25,-0.10);}
+       if( t >= 5.00 && t< 7.00)
+        {driveM.drive(0.00,0.00);
+        driveA.drive(-.50,0.00);}
+       if( t >= 7.00 && t< 9.50)
+        {driveA.drive(0.00,0.00);
+        driveM.drive(0.25,0.05);}
+       if( t >= 9.50)
+        {driveM.drive(0.00,0.00);}
+       lcd.println(Line.kUser3, 3, Double.toString(t));
+       lcd.updateLCD();
     }
 
     
     /**
      * This function is called periodically during operator control
      */
+    public void telopInit()     {
+    }
     public void teleopPeriodic() {
         lcd.println(Line.kUser1, 1, "Operator Control Enabled");
         lcd.updateLCD();
@@ -185,7 +197,7 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-        
+        //driveM.setSafetyEnabled(false);
         if(assistStick.getTrigger()) {
             liftMotor.set(-0.75);
         }
