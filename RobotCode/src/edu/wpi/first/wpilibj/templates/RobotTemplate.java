@@ -158,10 +158,16 @@ public class RobotTemplate extends IterativeRobot {
             //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
             driveA.arcadeDrive(assistStick, true);
-            if(assistStick.getTrigger())
-                launchMotor.set(-1.00);
+            
+            if(driveStick.getTrigger()) {
+            liftMotor.set(-1.00);
+            }
+            else if(assistStick.getTrigger()) {
+                liftMotor.set(1.00);
+            }
             else
-                launchMotor.set(0.00);
+            liftMotor.set(0.00);
+            
             
             dir = Math.toDegrees(assistStick.getDirectionRadians());
             
@@ -181,10 +187,10 @@ public class RobotTemplate extends IterativeRobot {
     public void testPeriodic() {
         
         if(assistStick.getTrigger()) {
-            liftMotor.set(-0.40);
+            liftMotor.set(-0.75);
         }
         else if(driveStick.getTrigger()) {
-            liftMotor.set(0.40);
+            liftMotor.set(0.75);
         }
         else
             liftMotor.set(0.00);
