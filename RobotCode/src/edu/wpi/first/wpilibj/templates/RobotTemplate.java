@@ -15,20 +15,19 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import java.util.Hashtable;
+//import java.util.Hashtable;
 
 // used to read and write values into the robot code with out recompiling,
 //download available at https://code.google.com/p/json-simple/downloads/list
-
-/*import java.io.FileNotFoundException;
+/*
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-*/
-
+/**
 
 
 /**
@@ -70,17 +69,17 @@ public class RobotTemplate extends IterativeRobot {
     double assistSpeed = 0.00;
     double driveTime2 = 0.00;
     double driveSpeed2 = 0.00;
-    
-    /*public class JsonSimpleExample {
+ /*  
+    public class JsonSimpleExample {
      public void readFile (String[] args) {
  
 	JSONParser parser = new JSONParser();
- 
+
 	try {
  
-		Object obj = parser.parse(new FileReader("c:\\test.json"));
+		Object obj = parser.parse(new FileReader("test.json"));
  
-		JSONObject jsonObject = (JSONObject) obj;
+		JSONArray jsonarray = (JSONArray) obj;
  
 		String name = (String) jsonObject.get("name");
 		System.out.println(name);
@@ -105,10 +104,11 @@ public class RobotTemplate extends IterativeRobot {
 		e.printStackTrace();
 	}
  
+                
      }
  
 }
-    */
+ */   
     public void robotInit() {
         lcd.println(Line.kUser6, 1, "Robot Initialized");
         lcd.updateLCD();
@@ -137,10 +137,14 @@ public class RobotTemplate extends IterativeRobot {
     public void autonomousPeriodic() {
        lcd.println(Line.kUser2, 2, "Auton enabled");
        t=timeKeeper.get();
-       if( t >=  0.00 && t < 5.00)
-       {driveM.drive(-0.25,-0.10);}
+       if ( t>= 0.00 && t <5.00){
+       liftMotor.set(-0.25);
+       driveM.drive(-0.25,-0.08);
+       }
        if( t >= 5.00 && t< 7.00)
-        {driveM.drive(0.00,0.00);
+       {liftMotor.set(0.0);
+        driveM.drive(0.00,0.00);
+        driveM.drive(0.10,0.10);
         driveA.drive(-.50,0.00);}
        if( t >= 7.00 && t< 9.50)
         {driveA.drive(0.00,0.00);
@@ -149,7 +153,7 @@ public class RobotTemplate extends IterativeRobot {
         {driveM.drive(0.00,0.00);}
        lcd.println(Line.kUser3, 3, Double.toString(t));
        lcd.updateLCD();
-    }
+    }   
 
     
     /**
@@ -230,4 +234,24 @@ public class RobotTemplate extends IterativeRobot {
         }
         
     }
-}
+    
+    public void Autonomous(int autonMode)
+    {       t=timeKeeper.get();
+      if(autonMode==1){ 
+       if ( t>= 0.00 && t <5.00){
+       liftMotor.set(-0.25);
+       driveM.drive(-0.25,-0.08);
+       }
+       if( t >= 5.00 && t< 7.00)
+       {liftMotor.set(0.0);
+        driveM.drive(0.00,0.00);
+        driveM.drive(0.10,0.10);
+        driveA.drive(-.50,0.00);}
+       if( t >= 7.00 && t< 9.50)
+        {driveA.drive(0.00,0.00);
+        driveM.drive(0.25,0.05);}
+       if( t >= 9.50)
+        {driveM.drive(0.00,0.00);}}
+    }
+    }
+
