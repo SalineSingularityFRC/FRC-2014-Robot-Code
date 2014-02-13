@@ -136,21 +136,7 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void autonomousPeriodic() {
        lcd.println(Line.kUser2, 2, "Auton enabled");
-       t=timeKeeper.get();
-       if ( t>= 0.00 && t <5.00){
-       liftMotor.set(-0.25);
-       driveM.drive(-0.25,-0.08);
-       }
-       if( t >= 5.00 && t< 7.00)
-       {liftMotor.set(0.0);
-        driveM.drive(0.00,0.00);
-        driveM.drive(0.10,0.10);
-        driveA.drive(-.50,0.00);}
-       if( t >= 7.00 && t< 9.50)
-        {driveA.drive(0.00,0.00);
-        driveM.drive(0.25,0.05);}
-       if( t >= 9.50)
-        {driveM.drive(0.00,0.00);}
+       Autonomous(1);
        lcd.println(Line.kUser3, 3, Double.toString(t));
        lcd.updateLCD();
     }   
