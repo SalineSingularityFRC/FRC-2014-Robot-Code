@@ -19,15 +19,18 @@ import edu.wpi.first.wpilibj.Victor;
 
 // used to read and write values into the robot code with out recompiling,
 //download available at https://code.google.com/p/json-simple/downloads/list
-/*
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-/**
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+import javax.microedition.io.Connector;
+
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
+import org.json.me.JSONTokener;
+
+import com.sun.squawk.io.BufferedReader;
+import com.sun.squawk.microedition.io.FileConnection;
 
 
 /**
@@ -69,46 +72,9 @@ public class RobotTemplate extends IterativeRobot {
     double assistSpeed = 0.00;
     double driveTime2 = 0.00;
     double driveSpeed2 = 0.00;
- /*  
-    public class JsonSimpleExample {
-     public void readFile (String[] args) {
- 
-	JSONParser parser = new JSONParser();
-
-	try {
- 
-		Object obj = parser.parse(new FileReader("test.json"));
- 
-		JSONArray jsonarray = (JSONArray) obj;
- 
-		String name = (String) jsonObject.get("name");
-		System.out.println(name);
-                lcd.println(Line.kUser6, 1,name );
-                
-		String age = (String) jsonObject.get("age");
-		System.out.println(age);
-                lcd.println(Line.kUser6, 1,age );
-                
-		// loop array
-		//JSONArray msg = (JSONArray) jsonObject.get("messages");
-		//Iterator<String> iterator = msg.iterator();
-		//while (iterator.hasNext()) {
-		//	System.out.println(iterator.next());
-		//}
- 
-	} catch (FileNotFoundException e)  {
-		e.printStackTrace();
-	} catch (IOException e) {
-		e.printStackTrace();
-        } catch (ParseException e) {
-		e.printStackTrace();
-	}
- 
-                
-     }
- 
-}
- */   
+    
+    // Begin RobotTemplate methods 
+    
     public void robotInit() {
         lcd.println(Line.kUser6, 1, "Robot Initialized");
         lcd.updateLCD();
@@ -204,6 +170,9 @@ public class RobotTemplate extends IterativeRobot {
         liftMotor.set(0.00);
                 */
     }
+    
+   
+   
     private double getSpeedByJoystick(double direction) {
         Math.abs(direction);
         double temp_dir = 90.0 - direction;
@@ -241,3 +210,92 @@ public class RobotTemplate extends IterativeRobot {
     }
     }
 
+     class JsonSimpleExample {
+     public void readFile (String[] args) {
+ 
+	//JSONParser parser = new JSONParser();
+        DriverStationLCD lcd = DriverStationLCD.getInstance();
+        JsonIO jsonParam = new JsonIO(); 
+         
+	try {
+		//Object obj = parser.parse(new FileReader("test.json"));
+                JSONObject jsonParamObj = JsonIO.fromJSONFile("test.json");
+            
+		//JSONArray jsonarray = (JSONArray) obj;
+ 
+		String name = (String) jsonParamObj.get("name");
+		System.out.println(name);
+                lcd.println(Line.kUser6, 1,name );
+                
+		String age = (String) jsonParamObj.get("age");
+		System.out.println(age);
+                lcd.println(Line.kUser6, 1,age );
+                
+		// loop array
+		//JSONArray msg = (JSONArray) jsonObject.get("messages");
+		//Iterator<String> iterator = msg.iterator();
+		//while (iterator.hasNext()) {
+		//	System.out.println(iterator.next());
+		//}
+ 
+	//} catch (FileNotFoundException e)  {
+	//	e.printStackTrace();
+	} catch (JSONException e) {
+		e.printStackTrace();
+       // } catch (IOException e) {
+		e.printStackTrace();
+       // } catch (ParseException e) {
+		e.printStackTrace();
+	}
+ 
+                
+     }
+ 
+}   
+
+ class JsonIO {
+    // Put methods for controlling this subsystem
+    // here. Call these from Commands.
+
+    public static String getFileContents(String filename) {
+        String url = "file:///" + filename;
+        String contents = "";
+        try {
+                FileConnection c = (FileConnection) Connector.open(url);
+                BufferedReader buf = new BufferedReader(new InputStreamReader(c
+                                .openInputStream()));
+                String line = "";
+                while ((line = buf.readLine()) != null) {
+                        contents += line + "\n";
+                }
+                c.close();
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+        return contents;
+    }
+
+    public static JSONObject fromJSONFile(String filename) {
+        try {
+                return new JSONObject(new JSONTokener(getFileContents(filename)));
+        } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+        }
+}
+
+    public static void writeToFile(String filename, String contents) {
+        String url = "file:///" + filename;
+        try {
+                FileConnection c = (FileConnection) Connector.open(url);
+                OutputStreamWriter writer = new OutputStreamWriter(c
+                                .openOutputStream());
+                writer.write(contents);
+                c.close();
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+    }
+
+
+}
