@@ -222,20 +222,38 @@ public class RobotTemplate extends IterativeRobot {
     }
     
     public void Autonomous(int autonMode)
-    {       t=timeKeeper.get();
-      if(autonMode==1){ 
-       if ( t>= 0.00 && t <5.00){
-       liftMotor.set(-0.25);
-       driveM.drive(-0.25,-0.08);
-       }
+    {       t=timeKeeper.get();      
+    
+    if(autonMode==1){ 
+       if( t >= 0.00 && t<5.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.30,0.00);}
+       if( t>= 3.00 && t<5.00)
+       {liftMotor.set(0.00);}
        if( t >= 5.00 && t< 7.00)
-       {liftMotor.set(0.0);
-        driveM.drive(0.00,0.00);
-        driveM.drive(0.10,0.10);
+       {driveM.drive(0.00,0.00);
+        driveM.drive(0.10,0.00);
         driveA.drive(-.50,0.00);}
        if( t >= 7.00 && t< 9.50)
+       {driveA.drive(0.00,0.00);
+        driveM.drive(0.25,0.00);}
+       if( t >= 9.50)
+       {driveM.drive(0.00,0.00);}}
+      
+    if(autonMode==2){ 
+       if ( t>= 0.00 && t < 4.00)
+        {liftMotor.set(-0.25);
+        driveM.drive(-0.35,-0.08);
+        }
+       if( t>= 4.00 && t < 5.00)
+        {driveM.drive(0.00,-.10);}
+       if( t >= 5.00 && t< 7.00)
+        {driveM.drive(0.00,0.00);
+         driveA.drive(-.30,0.00);}
+       if( t >= 7.00 && t< 8.00)
         {driveA.drive(0.00,0.00);
-        driveM.drive(0.25,0.05);}
+         driveM.drive(-0.35,0.10);}
+       if( t >=8.00)
        if( t >= 9.50)
         {driveM.drive(0.00,0.00);}}
     }
