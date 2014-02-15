@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.templates;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.DriverStationLCD.Line;
 import edu.wpi.first.wpilibj.RobotDrive; 
@@ -15,20 +16,19 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.Timer;
+//import java.util.Hashtable;
 
 // used to read and write values into the robot code with out recompiling,
 //download available at https://code.google.com/p/json-simple/downloads/list
-
-/*import java.io.FileNotFoundException;
+/*
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-*/
-
+/**
 
 
 /**
@@ -43,9 +43,10 @@ public class RobotTemplate extends IterativeRobot {
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
+    //DriverStation stats = new DriverStation();
     DriverStationLCD lcd = DriverStationLCD.getInstance();
     Joystick driveStick = new Joystick(1);
-    RobotDrive driveM = new RobotDrive(1, 2); // 
+    RobotDrive driveM = new RobotDrive(1, 2);
     Joystick assistStick = new Joystick(2);
     //Intake intakeSystem = new Intake(3, assistStick, lcd);
     RobotDrive driveA = new RobotDrive(3,10);
@@ -58,18 +59,31 @@ public class RobotTemplate extends IterativeRobot {
     double dirM;
     double dirX;
     double dirY;
-    double t = timeKeeper.get();
+    double t;
+    double s = 0;
     
-    /*public class JsonSimpleExample {
+    
+    double winchTime = 0.00;
+    double winchSpeed = 0.00;
+    double driveTime1 = 0.00;
+    double driveSpeed1 = 0.00;
+    double assistTime = 0.00;
+    double assistSpeed = 0.00;
+    double driveTime2 = 0.00;
+    double driveSpeed2 = 0.00;
+    
+    int autonSelect = 1;
+ /*  
+    public class JsonSimpleExample {
      public void readFile (String[] args) {
  
 	JSONParser parser = new JSONParser();
- 
+
 	try {
  
-		Object obj = parser.parse(new FileReader("c:\\test.json"));
+		Object obj = parser.parse(new FileReader("test.json"));
  
-		JSONObject jsonObject = (JSONObject) obj;
+		JSONArray jsonarray = (JSONArray) obj;
  
 		String name = (String) jsonObject.get("name");
 		System.out.println(name);
@@ -94,44 +108,52 @@ public class RobotTemplate extends IterativeRobot {
 		e.printStackTrace();
 	}
  
+                
      }
  
 }
-    
+ */   
     public void robotInit() {
-        lcd.println(Line.kUser6, 1, "Robot Initialized");    
-    }*/
+        lcd.clear();
+        lcd.println(Line.kUser5, 1, "Robot Initialized");
+        lcd.updateLCD();
+    //Hashtable<String, Double> autonParams =
+      //  autonParams = new Hashtable<String, Double>(); 
+   //autonParams.put("winchSpeed", );
+    }
 
+    public void autonomousInit() {
+        lcd.println(Line.kUser4, 1, "autoInit: TK reset");
+        lcd.updateLCD();
+        timeKeeper.reset();
+        timeKeeper.start();
+    }
+    
+    public void disabledInit(){
+        lcd.println(Line.kUser5, 1, "disabledInit: TK stop");
+        lcd.updateLCD();
+        timeKeeper.stop();
+    }
+    
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
+       lcd.println(Line.kUser2, 1, "Auton enabled");
+       Autonomous(autonSelect);
+       lcd.println(Line.kUser3, 1, Double.toString(t));
+       lcd.updateLCD();
        
-        
-        
-        liftMotor.set(-.30);
-        Timer.delay(2.50);
-        liftMotor.set(0.00);
-        driveM.drive(0.35, 0.0);
-        Timer.delay(2.00);
-        driveM.drive(0.0, 0.0);
-        driveA.drive(0.30,0.0);
-        Timer.delay(1.00);
-        driveA.drive(0.0,0.0);
-        driveM.drive(-0.35, 0.0);
-        Timer.delay(1.00);
-        driveM.drive(0.0, 0.0);
-        Timer.delay(3.50);
-    }
+    }   
 
+    
     /**
      * This function is called periodically during operator control
      */
+    public void telopInit()     {
+    }
     public void teleopPeriodic() {
-        lcd.println(Line.kUser1, 1, "Operator Control Enabled");
-        lcd.updateLCD();
-        
-        timeKeeper.start();
+        autonomousModeSelecter();
            
            dirX = driveStick.getX();
            dirY =driveStick.getY();
@@ -139,32 +161,50 @@ public class RobotTemplate extends IterativeRobot {
             
             //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
+            driveA.arcadeDrive(assistStick, true);
             
-            if(assistStick.getTrigger())
-                driveA.drive(1.00,0.0);
+            if(driveStick.getTrigger()) {
+            liftMotor.set(-1.00);
+            }
+            else if(assistStick.getTrigger()) {
+                liftMotor.set(1.00);
+            }
             else
-                driveA.arcadeDrive(driveStick, true);
+            liftMotor.set(0.00);
+            
             
             dir = Math.toDegrees(assistStick.getDirectionRadians());
             
+            lcd.println(Line.kUser1, 1, "Teleop Enabled");
+            lcd.println(Line.kUser2, 1, Double.toString(dir));
+            lcd.println(Line.kUser3, 1, Double.toString(dirM));
+            lcd.println(Line.kUser4, 1, Double.toString(dirX));
+            lcd.println(Line.kUser5, 1, Double.toString(dirY));
             
-            lcd.println(Line.kUser2, 2, Double.toString(dir));
-            lcd.println(Line.kUser3, 3, Double.toString(dirM));
-            lcd.println(Line.kUser4, 4, Double.toString(dirX));
-            lcd.println(Line.kUser5, 5, Double.toString(dirY));
             lcd.updateLCD();
             Timer.delay(0.005);
-            lcd.clear();
     }
     
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-            timeKeeper.start();
+        //driveM.setSafetyEnabled(false);
+        if(assistStick.getTrigger()) {
+            liftMotor.set(-0.75);
+        }
+        else if(driveStick.getTrigger()) {
+            liftMotor.set(0.75);
+        }
+        else
+            liftMotor.set(0.00);
+        //timeKeeper.start();
+        /*liftMotor.set(-0.25);
+        Timer.delay(0.50);
         liftMotor.set(0.25);
-        Timer.delay(1.00);
+        Timer.delay(3.00);
         liftMotor.set(0.00);
+                */
     }
     private double getSpeedByJoystick(double direction) {
         Math.abs(direction);
@@ -174,4 +214,102 @@ public class RobotTemplate extends IterativeRobot {
         else
             return -0.35;
     }
-}
+    
+    private class AutonEvent{
+        
+        AutonEvent(double startTime, double timeLength, double speed) {
+            
+        }
+        
+    }
+    
+    public void Autonomous(int autonMode)
+    {       t=timeKeeper.get();      
+    
+    if(autonMode==0){       
+       if( t >= 0.00 && t<3.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.25,-0.035);}
+       if( t >= 3.00 && t< 10.00)
+       {driveM.drive(0.00,0.00);
+        liftMotor.set(0.00);}}
+        
+    if(autonMode==1){ 
+       if( t >= 0.00 && t<5.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.25,-0.035);}
+       if( t>= 3.00 && t<5.00)
+       {liftMotor.set(0.00);}
+       if( t >= 5.00 && t< 7.00)
+       {driveM.drive(0.00,0.00);
+        driveA.drive(-.50,0.00);}
+       if( t >= 7.00 && t< 9.50)
+       {driveA.drive(0.00,0.00);
+        driveM.drive(0.25,0.00);}
+       if( t >= 9.50)
+       {driveM.drive(0.00,0.00);}}
+      
+    if(autonMode==2){ 
+       if ( t>= 0.00 && t < 4.00)
+        {liftMotor.set(-0.25);
+         driveM.drive(-0.35,-0.035);}
+       if( t>= 4.00 && t < 4.50)
+        {driveM.drive(0.00,.30);}
+       if( t >= 4.50 && t< 6.50)
+        {driveM.drive(0.00,0.00);
+         driveA.drive(-.50,0.00);}
+       if( t >= 6.50 && t< 7.00)
+        {driveA.drive(0.00,0.00);
+         driveM.drive(0.35,-0.30);}
+       if( t >=7.00 && t<8.50)
+        {driveM.drive(0.35,0.035);}
+       if( t >=8.50 && t<10.00)
+       {Timer.delay(1.50);}}
+    
+    if(autonMode==3){
+       if( t >= 0.00 && t<3.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.25,-0.035);}
+       if( t >=3.00 && t<3.50)
+       {liftMotor.set(0.00);
+        driveM.drive(-.10,.30);}
+       if( t>=3.50 && t<4.00)
+       {driveM.drive(0.00,-.30);}
+       if( t>=4.00 && t<6.00)
+       {driveM.drive(-0.25,-0.035);}
+       if( t >= 6.00 && t< 8.00)
+       {driveM.drive(0.00,0.00);
+        driveA.drive(-.50,0.00);}
+       if( t >= 8.00 && t< 8.50)
+        {driveA.drive(0.00,0.00);
+         driveM.drive(0.35,-0.30);}
+       if( t >=8.50 && t<10.00)
+        {driveM.drive(0.35,0.035);}}
+    
+    else{if( t >= 0.00 && t<3.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.25,-0.035);}
+       if( t >= 3.00 && t< 10.00)
+       {driveM.drive(0.00,0.00);
+        liftMotor.set(0.00);}}
+    }
+    
+    public void autonomousModeSelecter(){
+        if(assistStick.getRawButton(8)== true)
+        {autonSelect += 1;
+         lcd.println(Line.kUser6, 10, Double.toString(autonSelect));
+         lcd.updateLCD();
+         Timer.delay(2.00);
+        }
+        if(assistStick.getRawButton(9)== true)
+        {autonSelect -= 1;
+         lcd.println(Line.kUser6, 10, Double.toString(autonSelect));
+         lcd.updateLCD();
+         Timer.delay(2.00);
+        }
+        else{
+         lcd.println(Line.kUser6, 1,"AutonMode");
+         lcd.updateLCD();}
+            }
+    }
+
