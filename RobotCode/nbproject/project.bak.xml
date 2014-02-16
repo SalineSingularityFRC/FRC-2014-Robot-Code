@@ -92,8 +92,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="boot">${sunspot.home}\lib\squawk.jar</classpath>
-                <classpath mode="compile">C:/Users/Developer/sunspotfrcsdk\lib\wpilibj.jar;C:/Users/Developer/sunspotfrcsdk\lib\networktables-crio.jar</classpath>
+                <classpath mode="compile">C:/Users/Developer/sunspotfrcsdk\lib\wpilibj.jar;C:/Users/Developer/sunspotfrcsdk\lib\networktables-crio.jar;C:\Users\Developer\sunspotfrcsdk\lib</classpath>
                 <built-to>build</built-to>
                 <source-level>1.7</source-level>
             </compilation-unit>
