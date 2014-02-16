@@ -59,6 +59,7 @@ public class RobotTemplate extends IterativeRobot {
     double dirM;
     double dirX;
     double dirY;//dirs are directional radians
+    double dirYset;
     double t;//current time on timer
     double s = 0;
     double robotBatteryVoltage = DriverStation.getInstance().getBatteryVoltage();// battery voltage
@@ -169,13 +170,13 @@ public class RobotTemplate extends IterativeRobot {
         autonomousModeSelecter();
            
            dirX = driveStick.getX();
-           dirY =driveStick.getY();
+           dirY =assistStick.getY();
            dirM = driveStick.getDirectionRadians();
-           
+           dirYset=dirY;//directional radians multiplyed by a constant to cap values at 75%
             //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
-            driveA.arcadeDrive(assistStick, true);
-            
+            //driveA.arcadeDrive(assistStick, true);
+            driveA.drive(dirYset,0.00);
             if(driveStick.getRawButton(12)) {
             liftMotor.set(-1.00);
             }
@@ -192,7 +193,7 @@ public class RobotTemplate extends IterativeRobot {
             //lcd.println(Line.kUser2, 1, Double.toString(dir));
             //lcd.println(Line.kUser3, 1, Double.toString(dirM));
             //lcd.println(Line.kUser4, 1, Double.toString(dirX));
-            //lcd.println(Line.kUser5, 1, Double.toString(dirY));
+            lcd.println(Line.kUser5, 1, Double.toString(dirY));
             lcd.println(Line.kUser4,1,"Battery Voltage:");
             lcd.println(Line.kUser3,1,"Compensation Value:");
             lcd.println(Line.kUser4,17,Double.toString(robotBatteryVoltage));
