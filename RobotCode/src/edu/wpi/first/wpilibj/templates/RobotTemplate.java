@@ -62,7 +62,7 @@ public class RobotTemplate extends IterativeRobot {
     double dirYset;
     double t;//current time on timer
     double s = 0;
-    double robotBatteryVoltage = DriverStation.getInstance().getBatteryVoltage();// battery voltage
+    double robotBatteryVoltage;// battery voltage
     double m;// battery voltage compensation multiplier value
     
     double winchTime = 0.00;
@@ -77,7 +77,6 @@ public class RobotTemplate extends IterativeRobot {
     int autonSelect = 1;// current autonomous mode
 
     public RobotTemplate() {
-        m = 13.00/robotBatteryVoltage;
     }
  /*  
     public class JsonSimpleExample {
@@ -153,9 +152,9 @@ public class RobotTemplate extends IterativeRobot {
        Autonomous(autonSelect);
        lcd.println(Line.kUser3, 1, Double.toString(t));
        lcd.println(Line.kUser4,1,"Battery Voltage:");
-       lcd.println(Line.kUser3,1,"Compensation Value:");
+       lcd.println(Line.kUser3,1,"CValue:");
        lcd.println(Line.kUser4,17,Double.toString(robotBatteryVoltage));
-       lcd.println(Line.kUser3,20,Double.toString(m));
+       lcd.println(Line.kUser3,7,Double.toString(m));
        lcd.updateLCD();
        
     }   
@@ -168,19 +167,20 @@ public class RobotTemplate extends IterativeRobot {
     }
     public void teleopPeriodic() {
         autonomousModeSelecter();
-           
+           m = 13.00/robotBatteryVoltage;
+           robotBatteryVoltage=DriverStation.getInstance().getBatteryVoltage();
            dirX = driveStick.getX();
            dirY =assistStick.getY();
            dirM = driveStick.getDirectionRadians();
            dirYset=dirY;//directional radians multiplyed by a constant to cap values at 75%
             //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
-            //driveA.arcadeDrive(assistStick, true);
-            driveA.drive(dirYset,0.00);
-            if(driveStick.getRawButton(12)) {
+            driveA.arcadeDrive(assistStick, true);
+            //driveA.drive(dirYset,0.00);
+            if(assistStick.getRawButton(3)) {
             liftMotor.set(-1.00);
             }
-            else if(assistStick.getRawButton(7)) {
+            else if(assistStick.getRawButton(2)) {
                 liftMotor.set(1.00);
             }
             else
@@ -207,11 +207,11 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void testPeriodic() {
         //driveM.setSafetyEnabled(false);
-        if(assistStick.getRawButton(7)) {
-            liftMotor.set(-0.75);
+        if(assistStick.getRawButton(3)) {
+            liftMotor.set(-1.00);
         }
-        else if(driveStick.getRawButton(12)) {
-            liftMotor.set(0.75);
+        else if(assistStick.getRawButton(2)) {
+            liftMotor.set(1.00);
         }
         else
             liftMotor.set(0.00);
