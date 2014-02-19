@@ -118,20 +118,22 @@ public class RobotTemplate extends IterativeRobot {
  
 }
  */   
+    //Called when the robot is iniialized
     public void robotInit() {
         lcd.println(Line.kUser5, 1, "Robot Initialized");
         lcd.println(Line.kUser4,1,"Battery Voltage:");
-        lcd.println(Line.kUser3,1,"Compensation Value:");
+        lcd.println(Line.kUser3,1,"CValue:");
         lcd.println(Line.kUser4,17,Double.toString(robotBatteryVoltage));
-        lcd.println(Line.kUser3,20,Double.toString(m));
+        lcd.println(Line.kUser3,7,Double.toString(m));
         lcd.updateLCD();
-    //Hashtable<String, Double> autonParams =
-      //  autonParams = new Hashtable<String, Double>(); 
-   //autonParams.put("winchSpeed", );
     }
 
     public void autonomousInit() {
         lcd.println(Line.kUser5, 1, "autoInit: TK reset");
+        robotBatteryVoltage=DriverStation.getInstance().getBatteryVoltage();
+        m = 13.00/robotBatteryVoltage;
+        lcd.println(Line.kUser4,1,"Battery Voltage:");
+        lcd.println(Line.kUser3,1,"CValue:");
         lcd.updateLCD();
         timeKeeper.reset();
         timeKeeper.start();
@@ -144,13 +146,19 @@ public class RobotTemplate extends IterativeRobot {
         lcd.clear();
     }
     
+    
+    public void disabledPeriodic(){
+        
+        //autonomousModeSelector();
+    }
+    
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
        lcd.println(Line.kUser2, 1, "Auton enabled");
        Autonomous(autonSelect);
-       lcd.println(Line.kUser3, 1, Double.toString(t));
+       //lcd.println(Line.kUser3, 1, Double.toString(t));
        lcd.println(Line.kUser4,1,"Battery Voltage:");
        lcd.println(Line.kUser3,1,"CValue:");
        lcd.println(Line.kUser4,17,Double.toString(robotBatteryVoltage));
@@ -160,23 +168,24 @@ public class RobotTemplate extends IterativeRobot {
     }   
 
     
-    /**
-     * This function is called periodically during operator control
-     */
+    
+    //Called 
     public void telopInit()     {
+        //driveM.setMaxOutput(100.0);
     }
     public void teleopPeriodic() {
-        autonomousModeSelecter();
-           m = 13.00/robotBatteryVoltage;
+        autonomousModeSelector();
+        //if(assistStick.getRawButton(7)) {
+           // driveM.setMaxOutput(80.0);}
            robotBatteryVoltage=DriverStation.getInstance().getBatteryVoltage();
            dirX = driveStick.getX();
            dirY =assistStick.getY();
            dirM = driveStick.getDirectionRadians();
-           dirYset=dirY;//directional radians multiplyed by a constant to cap values at 75%
+           dirYset=dirY*(1.00/1.10);//directional radians multiplyed by a constant to cap values at 75%
             //if(0<dirM<) 
             driveM.arcadeDrive(driveStick, true); //Enabling Drive with Joystick
-            driveA.arcadeDrive(assistStick, true);
-            //driveA.drive(dirYset,0.00);
+            //driveA.arcadeDrive(assistStick, true);
+            driveA.drive(dirYset,0.00);
             if(assistStick.getRawButton(3)) {
             liftMotor.set(-1.00);
             }
@@ -195,9 +204,9 @@ public class RobotTemplate extends IterativeRobot {
             //lcd.println(Line.kUser4, 1, Double.toString(dirX));
             lcd.println(Line.kUser5, 1, Double.toString(dirY));
             lcd.println(Line.kUser4,1,"Battery Voltage:");
-            lcd.println(Line.kUser3,1,"Compensation Value:");
+            lcd.println(Line.kUser3,1,"CValue:");
             lcd.println(Line.kUser4,17,Double.toString(robotBatteryVoltage));
-            lcd.println(Line.kUser3,20,Double.toString(m));
+            lcd.println(Line.kUser3,7,Double.toString(m));
             lcd.updateLCD();
             Timer.delay(0.005);
     }
@@ -205,8 +214,11 @@ public class RobotTemplate extends IterativeRobot {
     /**
      * This function is called periodically during test mode
      */
+    //Called during test mode
+    //Used to change autonomous modes and move the assist arm up and down
     public void testPeriodic() {
         //driveM.setSafetyEnabled(false);
+        autonomousModeSelector();
         if(assistStick.getRawButton(3)) {
             liftMotor.set(-1.00);
         }
@@ -224,87 +236,89 @@ public class RobotTemplate extends IterativeRobot {
         else
             return -0.35;
     }
-    
+    /*
     private class AutonEvent{
         
-        AutonEvent(double startTime, double timeLength, double speed) {
-            
+        private double start;
+        private double end;
+        private double speed;
+        
+        AutonEvent(double startTime, double endTime, double speed) {
+            start = startTime;
+            end = endTime;
+            this.speed = speed;
         }
-        
+            
     }
-    
-    public void Autonomous(int autonMode)
-    {       t=timeKeeper.get();      
-    
-    if(autonMode==0){       
-       if( t >= 0.00 && t<3.00)
-       {liftMotor.set(1.00);
-        driveM.drive(-0.25,-0.035);}
-       if( t >= 3.00 && t< 10.00)
-       {driveM.drive(0.00,0.00);
-        liftMotor.set(0.00);}}
+    */
         
-    if(autonMode==1){ 
+    
+    
+    public void Autonomous(double autonMode)
+    {  
+        t=timeKeeper.get();
+        //m = 13.00/robotBatteryVoltage;
+    if(autonMode==0.0){if( t >= 0.00 && t<3.00)
+       {liftMotor.set(1.00);
+        driveM.drive(-0.25*m,-0.085);}
+       if( t >= 5.00 && t< 10.00)
+       {driveM.drive(0.00,0.00);
+        liftMotor.set(0.00);}}    
+        
+    if(autonMode==1.0){ 
        if( t >= 0.00 && t<5.00)
        {liftMotor.set(1.00);
-        driveM.drive(-0.25,-0.035);}
-       if( t>= 3.00 && t<5.00)
-       {liftMotor.set(0.00);}
+        driveM.drive(-0.25*m,-0.085);}
        if( t >= 5.00 && t< 7.00)
        {driveM.drive(0.00,0.00);
-        driveA.drive(-.50,0.00);}
+        liftMotor.set(0.00);
+        driveA.drive(-.40*m,0.00);}
        if( t >= 7.00 && t< 9.50)
        {driveA.drive(0.00,0.00);
-        driveM.drive(0.25,0.00);}
+        driveM.drive(0.25*m,0.00);}
        if( t >= 9.50)
        {driveM.drive(0.00,0.00);}}
       
-    if(autonMode==2){ 
+    /*if(autonMode==2.0){ 
        if ( t>= 0.00 && t < 4.00)
         {liftMotor.set(-0.25);
-         driveM.drive(-0.35,-0.035);}
+         driveM.drive(-0.35*m,-0.035);}
        if( t>= 4.00 && t < 4.50)
         {driveM.drive(0.00,.30);}
        if( t >= 4.50 && t< 6.50)
         {driveM.drive(0.00,0.00);
-         driveA.drive(-.50,0.00);}
+         driveA.drive(-.50*m,0.00);}
        if( t >= 6.50 && t< 7.00)
         {driveA.drive(0.00,0.00);
-         driveM.drive(0.35,-0.30);}
+         driveM.drive(0.35*m,-0.30);}
        if( t >=7.00 && t<8.50)
-        {driveM.drive(0.35,0.035);}
+        {driveM.drive(0.35*m,0.035);}
        if( t >=8.50 && t<10.00)
         {driveM.drive(0.00,0.00);}}
     
-    if(autonMode==3){
+    if(autonMode==3.0){
        if( t >= 0.00 && t<3.00)
        {liftMotor.set(1.00);
-        driveM.drive(-0.25,-0.035);}
+        driveM.drive(-0.25*m,-0.035);}
        if( t >=3.00 && t<3.50)
        {liftMotor.set(0.00);
-        driveM.drive(-.10,.30);}
+        driveM.drive(-.10*m,.30);}
        if( t>=3.50 && t<4.00)
        {driveM.drive(0.00,-.30);}
        if( t>=4.00 && t<6.00)
-       {driveM.drive(-0.25,-0.035);}
+       {driveM.drive(-0.25*m,-0.035);}
        if( t >= 6.00 && t< 8.00)
        {driveM.drive(0.00,0.00);
         driveA.drive(-.50,0.00);}
        if( t >= 8.00 && t< 8.50)
         {driveA.drive(0.00,0.00);
-         driveM.drive(0.35,-0.30);}
+         driveM.drive(0.35*m,-0.30);}
        if( t >=8.50 && t<10.00)
-        {driveM.drive(0.35,0.035);}}
-    
-    else{if( t >= 0.00 && t<3.00)
-       {liftMotor.set(1.00);
-        driveM.drive(-0.25,-0.035);}
-       if( t >= 3.00 && t< 10.00)
-       {driveM.drive(0.00,0.00);
-        liftMotor.set(0.00);}}
+        {driveM.drive(0.35*m,0.035);}}
+    */
     }
     
-    public void autonomousModeSelecter(){
+    public void autonomousModeSelector(){
         if(assistStick.getRawButton(8)== true)
         {autonSelect += 1;
          lcd.println(Line.kUser6, 10, Double.toString(autonSelect));
