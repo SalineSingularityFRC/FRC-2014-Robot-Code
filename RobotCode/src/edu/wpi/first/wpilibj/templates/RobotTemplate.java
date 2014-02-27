@@ -131,7 +131,6 @@ public class RobotTemplate extends IterativeRobot {
     public void autonomousInit() {
         lcd.println(Line.kUser5, 1, "autoInit: TK reset");
         robotBatteryVoltage=DriverStation.getInstance().getBatteryVoltage();
-        m = 13.00/robotBatteryVoltage;
         lcd.println(Line.kUser4,1,"Battery Voltage:");
         lcd.println(Line.kUser3,1,"CValue:");
         lcd.updateLCD();
@@ -157,6 +156,7 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void autonomousPeriodic() {
        lcd.println(Line.kUser2, 1, "Auton enabled");
+       m = 13.00/robotBatteryVoltage;
        Autonomous(autonSelect);
        //lcd.println(Line.kUser3, 1, Double.toString(t));
        lcd.println(Line.kUser4,1,"Battery Voltage:");
@@ -259,16 +259,16 @@ public class RobotTemplate extends IterativeRobot {
         t=timeKeeper.get();
         //m = 13.00/robotBatteryVoltage;
     if(autonMode==0.0){if( t >= 0.00 && t<3.00)
-       {liftMotor.set(1.00);
-        driveM.drive(-0.25*m,-0.085);}
+       {liftMotor.set(1.00*m);
+        driveM.drive(-0.25*m,-0.085*m);}
        if( t >= 5.00 && t< 10.00)
        {driveM.drive(0.00,0.00);
         liftMotor.set(0.00);}}    
         
     if(autonMode==1.0){ 
        if( t >= 0.00 && t<5.00)
-       {liftMotor.set(1.00);
-        driveM.drive(-0.25*m,-0.085);}
+       {liftMotor.set(1.00*m);
+        driveM.drive(-0.25*m,-0.085*m);}
        if( t >= 5.00 && t< 7.00)
        {driveM.drive(0.00,0.00);
         liftMotor.set(0.00);
@@ -282,39 +282,39 @@ public class RobotTemplate extends IterativeRobot {
     /*if(autonMode==2.0){ 
        if ( t>= 0.00 && t < 4.00)
         {liftMotor.set(-0.25);
-         driveM.drive(-0.35*m,-0.035);}
+         driveM.drive(-0.35*m,-0.035*m);}
        if( t>= 4.00 && t < 4.50)
-        {driveM.drive(0.00,.30);}
+        {driveM.drive(0.00,.30*m);}
        if( t >= 4.50 && t< 6.50)
         {driveM.drive(0.00,0.00);
          driveA.drive(-.50*m,0.00);}
        if( t >= 6.50 && t< 7.00)
         {driveA.drive(0.00,0.00);
-         driveM.drive(0.35*m,-0.30);}
+         driveM.drive(0.35*m,-0.30*m);}
        if( t >=7.00 && t<8.50)
-        {driveM.drive(0.35*m,0.035);}
+        {driveM.drive(0.35*m,0.035*m);}
        if( t >=8.50 && t<10.00)
         {driveM.drive(0.00,0.00);}}
     
     if(autonMode==3.0){
        if( t >= 0.00 && t<3.00)
        {liftMotor.set(1.00);
-        driveM.drive(-0.25*m,-0.035);}
+        driveM.drive(-0.25*m,-0.035*m);}
        if( t >=3.00 && t<3.50)
        {liftMotor.set(0.00);
-        driveM.drive(-.10*m,.30);}
+        driveM.drive(-.10*m,.30*m);}
        if( t>=3.50 && t<4.00)
-       {driveM.drive(0.00,-.30);}
+       {driveM.drive(0.00,-.30*m);}
        if( t>=4.00 && t<6.00)
-       {driveM.drive(-0.25*m,-0.035);}
+       {driveM.drive(-0.25*m,-0.035*m);}
        if( t >= 6.00 && t< 8.00)
        {driveM.drive(0.00,0.00);
-        driveA.drive(-.50,0.00);}
+        driveA.drive(-.50*m,0.00);}
        if( t >= 8.00 && t< 8.50)
         {driveA.drive(0.00,0.00);
-         driveM.drive(0.35*m,-0.30);}
+         driveM.drive(0.35*m,-0.30*m);}
        if( t >=8.50 && t<10.00)
-        {driveM.drive(0.35*m,0.035);}}
+        {driveM.drive(0.35*m,0.035*m);}}
     */
     }
     
